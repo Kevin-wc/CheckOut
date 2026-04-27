@@ -7,15 +7,15 @@ using System.Collections.Generic;
 public class PlayerMovement : MonoBehaviour
 {
     public Camera playerCamera;
-    public float walkSpeed = 6.0f;
-    public float runSpeed = 12.0f;
-    public float jumpSpeed = 8.0f;
-    public float gravity = 10.0f;
-    public float lookSpeed = 2.0f;
-    public float lookXLimit = 45.0f;
-    public float defaultHeight = 2f;
-    public float crouchHeight = 1f;
-    public float crouchSpeed = 3f;
+    public float walkSpeed;
+    public float runSpeed;
+    public float jumpSpeed;
+    public float gravity;
+    public float lookSpeed;
+    public float lookXLimit;
+    public float defaultHeight;
+    public float crouchHeight;
+    public float crouchSpeed;
 
     private Vector3 moveDirection = Vector3.zero;
     private float rotationX = 0;
