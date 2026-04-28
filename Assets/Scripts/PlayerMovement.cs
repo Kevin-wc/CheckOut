@@ -51,9 +51,6 @@ public class PlayerMovement : MonoBehaviour
         {
             playerCamera = Camera.main;
         }
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
 
     void Update()
