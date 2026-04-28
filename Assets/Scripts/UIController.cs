@@ -7,6 +7,7 @@ public class UIController : MonoBehaviour
 
     [Header("UI References")]
     [SerializeField] private TMP_Text objectiveText;
+    [SerializeField] private TMP_Text interactText;
 
     private void Awake()
     {
@@ -29,5 +30,15 @@ public class UIController : MonoBehaviour
         {
             Debug.LogWarning("Objective Text reference is missing in UIController.");
         }
+    }
+    public void ShowInteractText(string text)
+    {
+        interactText.gameObject.SetActive(true);
+        interactText.text = text;
+    }
+
+    public void HideInteractText()
+    {
+        interactText.gameObject.SetActive(false);
     }
 }

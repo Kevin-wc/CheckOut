@@ -46,10 +46,12 @@ public class InteractionManager : MonoBehaviour
 
             if (currentInteractable != null)
             {
+                UIController.Instance.ShowInteractText(currentInteractable.GetInteractText());
                 return;
             }
         }
         currentInteractable = null;
+        UIController.Instance.HideInteractText();
     }
 
     public void TryInteract()
