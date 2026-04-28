@@ -22,8 +22,9 @@ public class CleanDirtInteractable : MonoBehaviour, Interactable
         taskCompleted = true;
 
         TaskManager.Instance.cleanedDirt = true;
-        TaskManager.Instance.CompleteTask();
         TaskManager.Instance.UpdateTaskUI();
+        TaskManager.Instance.CompleteTask();
+
 
         Debug.Log("You cleaned the dirt.");
         gameObject.SetActive(false);

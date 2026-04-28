@@ -17,8 +17,9 @@ public class BroomInteractable : MonoBehaviour, Interactable
 
 
         TaskManager.Instance.GetBroom();
-        TaskManager.Instance.CompleteTask();
         TaskManager.Instance.UpdateTaskUI();
+        TaskManager.Instance.CompleteTask();
+
 
         Debug.Log("You got the broom.");
     }

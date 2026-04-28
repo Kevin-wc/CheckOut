@@ -32,8 +32,9 @@ public class TaskInteractable : MonoBehaviour, Interactable
 
         Debug.Log("Task Completed: " + taskType);
 
-        TaskManager.Instance.CompleteTask();
         TaskManager.Instance.UpdateTaskUI();
+        TaskManager.Instance.CompleteTask();
+
     }
 
     public string GetInteractText()

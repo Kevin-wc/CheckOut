@@ -19,6 +19,10 @@ public class TaskManager : MonoBehaviour
     [Header("Item State")]
     public bool hasBroom;
 
+    [Header("Final Scare")]
+    [SerializeField] private GameObject stalkerObject;
+    public bool finalScareStarted;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -77,6 +81,15 @@ public class TaskManager : MonoBehaviour
         // Implement final scare logic here
         Debug.Log("A book falls from the shelf");
         Debug.Log("Objective: Run to the office!");
+
+        finalScareStarted = true;
+
+        if (stalkerObject != null)
+        {
+            stalkerObject.SetActive(true);
+        }
+
+        UIController.Instance.UpdateObjectiveText("RUN TO THE OFFICE AND CALL THE POLICE!");
     }
 
     public void GetBroom()
