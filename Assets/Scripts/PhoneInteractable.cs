@@ -5,6 +5,8 @@ public class PhoneInteractable : MonoBehaviour, Interactable
     [SerializeField] private string interactText = "Call the police!";
     [SerializeField] private bool usedPhone;
 
+
+
     public void Interact()
     {
         if (!TaskManager.Instance.finalScareStarted)
@@ -15,6 +17,8 @@ public class PhoneInteractable : MonoBehaviour, Interactable
         {
             return;
         }
+
+
 
         usedPhone = true;
 
@@ -29,9 +33,11 @@ public class PhoneInteractable : MonoBehaviour, Interactable
             Debug.LogWarning("UIController instance is missing. Cannot update objective text.");
         }
 
-
         PlayerMovement.Instance.enabled = false;
+        TaskManager.Instance.StopChaseMusic();
+        Time.timeScale = 0f;
     }
+
 
     public string GetInteractText()
     {

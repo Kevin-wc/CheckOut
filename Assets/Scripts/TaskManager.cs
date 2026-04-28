@@ -3,6 +3,7 @@ using UnityEngine;
 public class TaskManager : MonoBehaviour
 {
     public static TaskManager Instance;
+    [SerializeField] private StalkerAI stalkerAI;
 
     [Header("Task Settings")]
     [SerializeField] private int currentTask;
@@ -22,6 +23,10 @@ public class TaskManager : MonoBehaviour
     [Header("Final Scare")]
     [SerializeField] private GameObject stalkerObject;
     public bool finalScareStarted;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource chaseMusicAudio;
+
 
     private void Awake()
     {
@@ -87,6 +92,17 @@ public class TaskManager : MonoBehaviour
         if (stalkerObject != null)
         {
             stalkerObject.SetActive(true);
+            StalkerAI stalkerAI = stalkerObject.GetComponent<StalkerAI>();
+        }
+
+        if (stalkerAI != null)
+        {
+            stalkerAI.StartChase();
+        }
+
+        if (chaseMusicAudio != null)
+        {
+            chaseMusicAudio.Play();
         }
 
         UIController.Instance.UpdateObjectiveText("RUN TO THE OFFICE AND CALL THE POLICE!");
@@ -148,6 +164,14 @@ public class TaskManager : MonoBehaviour
         }
 
         UIController.Instance.UpdateObjectiveText(text);
+    }
+
+    public void StopChaseMusic()
+    {
+        if (chaseMusicAudio != null && chaseMusicAudio.isPlaying)
+        {
+            chaseMusicAudio.Stop();
+        }
     }
 
 }
