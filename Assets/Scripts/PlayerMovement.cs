@@ -1,103 +1,164 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(AudioSource))]
-[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    public Camera playerCamera;
-    public float walkSpeed;
-    public float runSpeed;
-    public float jumpSpeed;
-    public float gravity;
-    public float lookSpeed;
-    public float lookXLimit;
-    public float defaultHeight;
-    public float crouchHeight;
-    public float crouchSpeed;
+    public static PlayerMovement Instance;
 
-    private Vector3 moveDirection = Vector3.zero;
-    private float rotationX = 0;
-    private CharacterController characterController;
-    private AudioSource footstepAudio;
+    [Header("Player Components")]
+    [SerializeField] private CharacterController characterController;
+    [SerializeField] private Camera playerCamera;
+    [SerializeField] private AudioSource footstepAudioSource;
 
-    private bool canMove = true;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [Header("Movement Settings")]
+    [SerializeField] private float walkSpeed = 2.4f;
+    [SerializeField] private float runSpeed = 3.8f;
+    [SerializeField] private float gravity = -20f;
+
+    [Header("Camera Settings")]
+    [SerializeField] private float lookSpeed = 0.03f;
+    [SerializeField] private float lookXLimit = 80f;
+
+    [Header("Player State")]
+    [SerializeField] private bool canMove = true;
+    [SerializeField] private bool canLook = true;
+
+    private Vector2 moveInput;
+    private Vector2 lookInput;
+
+    private Vector3 moveDirection;
+    private float verticalVelocity;
+    private float rotationX;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-        footstepAudio = GetComponent<AudioSource>();
+        footstepAudioSource = GetComponent<AudioSource>();
+
+        if (playerCamera == null)
+        {
+            playerCamera = Camera.main;
+        }
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector3 forward = transform.TransformDirection(Vector3.forward);
-        Vector3 right = transform.TransformDirection(Vector3.right);
+        movePlayer();
+        moveCamera();
+        handleFootsteps();
+    }
 
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        // The following lines are used to determine the movement direction based on the input keys and grabbed from a youtube video, not AI, will gladly referenced if asked.
-        float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
-        float movementDirectionY = moveDirection.y;
-        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
-
-        if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
+    private void movePlayer()
+    {
+        if (!canMove)
         {
-            moveDirection.y = jumpSpeed;
+            return;
+        }
+
+        float currentSpeed = walkSpeed;
+
+        if (Keyboard.current.leftShiftKey.isPressed)
+        {
+            currentSpeed = runSpeed;
+        }
+
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        moveDirection = (forward * moveInput.y) + (right * moveInput.x);
+
+        if (moveDirection.magnitude > 1)
+        {
+            moveDirection.Normalize();
+        }
+
+        moveDirection = moveDirection * currentSpeed;
+
+        if (characterController.isGrounded)
+        {
+            verticalVelocity = -2f;
         }
         else
         {
-            moveDirection.y = movementDirectionY;
+            verticalVelocity += gravity * Time.deltaTime;
         }
 
-        if (!characterController.isGrounded)
-        {
-            moveDirection.y -= gravity * Time.deltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.R) && canMove)
-        {
-            characterController.height = crouchHeight;
-            walkSpeed = crouchSpeed;
-            runSpeed = crouchSpeed;
-        }
-        else
-        {
-            characterController.height = defaultHeight;
-            walkSpeed = 6.0f;
-            runSpeed = 12.0f;
-        }
-
+        moveDirection.y = verticalVelocity;
         characterController.Move(moveDirection * Time.deltaTime);
+    }
 
-        bool isMoving = characterController.isGrounded &&
-                        Mathf.Abs(Input.GetAxisRaw("Vertical")) > 0.1f || Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.1f;
+    private void moveCamera()
+    {
+        if (!canLook)
+        {
+            return;
+        }
+
+        rotationX -= lookInput.y * lookSpeed;
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+
+        playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        transform.Rotate(Vector3.up * lookInput.x * lookSpeed);
+
+        lookInput = Vector2.zero;
+    }
+
+    private void handleFootsteps()
+    {
+        if (footstepAudioSource == null)
+        {
+            return;
+        }
+
+        bool isMoving = characterController.isGrounded && moveInput.magnitude > 0.1f;
 
         if (isMoving)
         {
-            if (!footstepAudio.isPlaying)
+            if (!footstepAudioSource.isPlaying)
             {
-                footstepAudio.Play();
+                footstepAudioSource.Play();
             }
         }
         else
         {
-            if (footstepAudio.isPlaying)
+            if (footstepAudioSource.isPlaying)
             {
-                footstepAudio.Stop();
+                footstepAudioSource.Stop();
             }
         }
+    }
 
-        if (canMove)
+    public void OnMove(InputValue value)
+    {
+        moveInput = value.Get<Vector2>();
+    }
+
+    public void OnLook(InputValue value)
+    {
+        lookInput = value.Get<Vector2>();
+    }
+
+    public void OnInteract(InputValue value)
+    {
+        if (value.isPressed)
         {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+            Debug.Log("E button pressed");
+            InteractionManager.Instance.TryInteract();
         }
     }
 }
