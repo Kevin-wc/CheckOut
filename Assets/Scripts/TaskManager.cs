@@ -3,10 +3,21 @@ using UnityEngine;
 public class TaskManager : MonoBehaviour
 {
     public static TaskManager Instance;
+
     [Header("Task Settings")]
     [SerializeField] private int currentTask;
     [SerializeField] private int totalTasks;
     private bool tasksComplete;
+
+    [Header("Task State")]
+    public bool restockedBooks;
+    public bool cleanedTable;
+    public bool checkedRegister;
+    public bool gotBroom;
+    public bool cleanedDirt;
+
+    [Header("Item State")]
+    public bool hasBroom;
 
     private void Awake()
     {
@@ -22,8 +33,7 @@ public class TaskManager : MonoBehaviour
 
     void Start()
     {
-        currentTask = 0;
-        Debug.Log("Objective: Organize the books");
+        UpdateTaskUI();
     }
 
     public void CompleteTask()
@@ -35,6 +45,8 @@ public class TaskManager : MonoBehaviour
 
         currentTask++;
 
+        Debug.Log("Task complete. Current task: " + currentTask);
+
         if (currentTask == 1)
         {
             Debug.Log("Objective: Clean the reading table.");
@@ -42,6 +54,14 @@ public class TaskManager : MonoBehaviour
         else if (currentTask == 2)
         {
             Debug.Log("Objective: Check the register");
+        }
+        else if (currentTask == 3)
+        {
+            Debug.Log("Objective: Get the broom from closet");
+        }
+        else if (currentTask == 4)
+        {
+            Debug.Log("Objective: Clean the dirt from the library floor");
         }
         else if (currentTask >= totalTasks)
         {
@@ -57,6 +77,64 @@ public class TaskManager : MonoBehaviour
         // Implement final scare logic here
         Debug.Log("A book falls from the shelf");
         Debug.Log("Objective: Run to the office!");
+    }
+
+    public void GetBroom()
+    {
+        hasBroom = true;
+        gotBroom = true;
+        Debug.Log("You picked up the broom.");
+    }
+
+    public void UpdateTaskUI()
+    {
+        string text = "Closing Tasks:\n";
+
+        if (restockedBooks)
+        {
+            text += "<s>Restock Books</s>\n";
+        }
+        else
+        {
+            text += "Restock Books\n";
+        }
+        if (cleanedTable)
+        {
+            text += "<s>Clean Reading Table</s>\n";
+        }
+        else
+        {
+            text += "Clean Reading Table\n";
+        }
+
+        if (checkedRegister)
+        {
+            text += "<s>Check Register</s>\n";
+        }
+        else
+        {
+            text += "Check Register\n";
+        }
+
+        if (gotBroom)
+        {
+            text += "<s>Get Broom</s>\n";
+        }
+        else
+        {
+            text += "Get Broom\n";
+        }
+
+        if (cleanedDirt)
+        {
+            text += "<s>Clean Dirt</s>\n";
+        }
+        else
+        {
+            text += "Clean Dirt\n";
+        }
+
+        UIController.Instance.UpdateObjectiveText(text);
     }
 
 }

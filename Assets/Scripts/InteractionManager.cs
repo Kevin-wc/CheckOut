@@ -46,7 +46,6 @@ public class InteractionManager : MonoBehaviour
 
             if (currentInteractable != null)
             {
-                Debug.Log(currentInteractable.GetInteractText());
                 return;
             }
         }
